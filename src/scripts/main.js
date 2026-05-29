@@ -1,185 +1,162 @@
 // src/scripts/main.js
 
-import { Assets, Blessings } from './assets.js';
+import { Assets, Blessings, JatakaStory } from './assets.js';
 import { ParticleSystem } from './particles.js';
 
 class VesakExperience {
   constructor() {
+    this.currentScene = 0;
+    this.scenes = ['scene-lanterns', 'scene-thoran', 'scene-temple'];
+    
     this.dom = {
       intro: document.getElementById('intro-screen'),
-      candle: document.getElementById('initial-candle'),
       enterBtn: document.getElementById('enter-btn'),
       world: document.getElementById('immersive-world'),
+      nextBtn: document.getElementById('next-scene-btn'),
       lanternContainer: document.getElementById('lantern-container'),
-      templeLayer: document.getElementById('temple-layer'),
-      parallaxLayers: document.querySelectorAll('.layer'),
+      thoranContainer: document.getElementById('thoran-container'),
+      templeContainer: document.getElementById('temple-container'),
       audio: document.getElementById('ambient-audio'),
       muteBtn: document.getElementById('mute-btn'),
       modal: document.getElementById('blessing-modal'),
-      blessingText: document.getElementById('blessing-text'),
+      modalTitle: document.getElementById('modal-title'),
+      modalText: document.getElementById('blessing-text'),
       closeModal: document.getElementById('close-modal')
     };
-
-    this.mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
-    this.isEntered = false;
 
     this.init();
   }
 
   init() {
-    // Inject SVGs
-    this.dom.candle.innerHTML = Assets.candle;
-    this.dom.templeLayer.innerHTML = Assets.templeSilhouette;
+    document.getElementById('initial-candle').innerHTML = Assets.candle;
+    
+    // Intro Anim
+    gsap.to('#initial-candle', { opacity: 1, duration: 2, delay: 0.5 });
+    gsap.to('.intro-title', { opacity: 1, duration: 1.5, y: -10, delay: 1 });
+    gsap.to(this.dom.enterBtn, { opacity: 1, duration: 1, y: -5, delay: 1.5 });
 
-    // Intro Animation Sequence
-    const tl = gsap.timeline();
-    tl.to(this.dom.candle, { opacity: 1, duration: 2, ease: "power2.inOut", delay: 0.5 })
-      .to('.intro-title', { opacity: 1, duration: 1.5, y: -10, ease: "power2.out" })
-      .to(this.dom.enterBtn, { opacity: 1, duration: 1, y: -5, ease: "power2.out" });
-
-    // Event Listeners
-    this.dom.enterBtn.addEventListener('click', () => this.enterWorld());
-    this.dom.muteBtn.addEventListener('click', () => this.toggleAudio());
+    this.dom.enterBtn.addEventListener('click', () => this.startJourney());
+    this.dom.nextBtn.addEventListener('click', () => this.goToNextScene());
     this.dom.closeModal.addEventListener('click', () => this.closeModal());
+    this.dom.muteBtn.addEventListener('click', () => {
+      this.dom.audio.muted = !this.dom.audio.muted;
+      this.dom.muteBtn.style.color = this.dom.audio.muted ? 'var(--mist-gray)' : 'var(--warm-gold)';
+    });
   }
 
-  enterWorld() {
-    this.isEntered = true;
-    
-    // Attempt Audio Play
+  startJourney() {
     this.dom.audio.volume = 0.4;
-    this.dom.audio.play().catch(e => console.log("Audio autoplay blocked", e));
+    this.dom.audio.play().catch(() => console.log("Audio blocked"));
 
-    // Transition Timeline
-    const tl = gsap.timeline();
-    tl.to(this.dom.intro, { opacity: 0, duration: 1.5, ease: "power2.inOut", onComplete: () => this.dom.intro.style.display = 'none' })
-      .set(this.dom.world, { opacity: 1, pointerEvents: 'all' })
-      .add(() => {
-        new ParticleSystem('ambient-particles');
-        this.spawnLanterns();
-        this.generateThoranLights();
-        this.initParallax();
-      })
-      .from('.layer-temple', { y: 50, opacity: 0, duration: 3, ease: "power3.out" })
-      .from('.lantern-wrapper', { y: '100vh', opacity: 0, duration: 4, stagger: 0.2, ease: "power2.out" }, "-=2");
+    gsap.to(this.dom.intro, { opacity: 0, duration: 1.5, onComplete: () => {
+      this.dom.intro.style.display = 'none';
+      gsap.set(this.dom.world, { opacity: 1, pointerEvents: 'all' });
+      
+      new ParticleSystem('ambient-particles');
+      this.buildLanternScene();
+      this.buildThoranScene();
+      this.buildTempleScene();
+      
+      this.dom.nextBtn.classList.remove('hidden');
+      gsap.from(this.dom.nextBtn, { opacity: 0, y: 20, duration: 2, delay: 3 });
+    }});
   }
 
-  spawnLanterns() {
-    const count = window.innerWidth < 768 ? 6 : 12;
-    
+  buildLanternScene() {
+    const count = window.innerWidth < 768 ? 6 : 10;
     for (let i = 0; i < count; i++) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'lantern-wrapper';
+      const wrap = document.createElement('div');
+      wrap.className = 'lantern-wrapper';
+      wrap.style.left = `${Math.random() * 80 + 10}%`;
+      wrap.style.top = `${Math.random() * 60}%`;
       
-      // Random positioning
-      const left = Math.random() * 90;
-      const top = Math.random() * 60 + 10;
-      const scale = Math.random() * 0.5 + 0.5; // Depth simulation
-      
-      wrapper.style.left = `${left}%`;
-      wrapper.style.top = `${top}%`;
-      wrapper.style.transform = `scale(${scale})`;
-      
-      // Assign random blessing
       const blessing = Blessings[Math.floor(Math.random() * Blessings.length)];
-      wrapper.dataset.blessing = blessing;
-
-      wrapper.innerHTML = Assets.getLantern(100 * scale, 140 * scale);
+      wrap.innerHTML = Assets.getLantern(100, 140);
+      wrap.addEventListener('click', () => this.showModal("A Vesak Blessing", blessing));
       
-      wrapper.addEventListener('click', () => this.showBlessing(blessing));
+      this.dom.lanternContainer.appendChild(wrap);
 
-      this.dom.lanternContainer.appendChild(wrapper);
-
-      // Continuous floating animation
-      gsap.to(wrapper, {
+      gsap.to(wrap, {
         y: `-=${Math.random() * 30 + 20}`,
-        x: `+=${Math.random() * 20 - 10}`,
         rotation: Math.random() * 10 - 5,
         duration: Math.random() * 4 + 4,
-        yoyo: true,
-        repeat: -1,
-        ease: "sine.inOut",
-        delay: Math.random() * 2
+        yoyo: true, repeat: -1, ease: "sine.inOut"
       });
     }
   }
 
-  generateThoranLights() {
-    const container = document.getElementById('thoran-lights');
-    // Simplified geometric thoran backdrop representation
-    for(let i=0; i<30; i++) {
-      const light = document.createElement('div');
-      light.className = 'thoran-light';
-      light.style.left = `${Math.random() * 100}%`;
-      light.style.top = `${Math.random() * 100}%`;
-      container.appendChild(light);
+  buildThoranScene() {
+    // Build 3 glowing panels for the Jataka Story
+    const positions = [
+      { left: '50px', top: '150px' }, // Left
+      { left: '240px', top: '50px' }, // Center Top
+      { left: '430px', top: '150px' } // Right
+    ];
 
-      // Chasing light effect
-      gsap.to(light, {
-        opacity: 0.2,
-        duration: Math.random() * 1 + 0.5,
-        yoyo: true,
-        repeat: -1,
-        ease: "steps(2)",
-        delay: Math.random() * 2
-      });
-    }
-  }
+    JatakaStory.forEach((part, index) => {
+      const panel = document.createElement('div');
+      panel.className = 'thoran-panel';
+      panel.style.left = positions[index].left;
+      panel.style.top = positions[index].top;
+      
+      // Panel Number
+      panel.innerHTML = `<span style="font-family: var(--font-serif); color: var(--warm-gold); font-size: 2rem;">${index + 1}</span>`;
+      
+      panel.addEventListener('click', () => this.showModal(`Part ${index + 1}: ${part.title}`, part.text));
+      this.dom.thoranContainer.appendChild(panel);
 
-  initParallax() {
-    window.addEventListener('mousemove', (e) => {
-      // Normalize mouse coordinates to -1 to 1
-      this.mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
-      this.mouse.targetY = (e.clientY / window.innerHeight) * 2 - 1;
-    });
-
-    // Smooth interpolation (Lerp) for cinematic camera feel
-    gsap.ticker.add(() => {
-      if(!this.isEntered) return;
-      this.mouse.x += (this.mouse.targetX - this.mouse.x) * 0.05;
-      this.mouse.y += (this.mouse.targetY - this.mouse.y) * 0.05;
-
-      this.dom.parallaxLayers.forEach(layer => {
-        const depth = parseFloat(layer.getAttribute('data-depth'));
-        const moveX = this.mouse.x * (depth * 30);
-        const moveY = this.mouse.y * (depth * 15);
-        gsap.set(layer, { x: moveX, y: moveY });
+      // Gentle pulsing of panels
+      gsap.to(panel, {
+        boxShadow: "inset 0 0 30px rgba(249, 215, 126, 0.4), 0 0 30px rgba(249, 215, 126, 0.6)",
+        duration: 2, yoyo: true, repeat: -1, ease: "sine.inOut", delay: index * 0.5
       });
     });
   }
 
-  showBlessing(text) {
-    this.dom.blessingText.innerText = text;
-    gsap.to(this.dom.modal, { opacity: 1, duration: 0.5, ease: "power2.out", onStart: () => this.dom.modal.classList.add('active') });
-    
-    // Small modal enter animation
-    gsap.fromTo('.glass-panel', 
-      { y: 30, scale: 0.95 }, 
-      { y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" }
+  buildTempleScene() {
+    this.dom.templeContainer.innerHTML = Assets.stupa;
+  }
+
+  goToNextScene() {
+    if (this.currentScene >= this.scenes.length - 1) return;
+
+    const currentEl = document.getElementById(this.scenes[this.currentScene]);
+    this.currentScene++;
+    const nextEl = document.getElementById(this.scenes[this.currentScene]);
+
+    // Cinematic "Walking Forward" transition
+    gsap.to(currentEl, { 
+      opacity: 0, 
+      scale: 1.5, // Zoom past the camera
+      translateZ: 200, 
+      duration: 1.5, 
+      ease: "power2.in",
+      onComplete: () => currentEl.classList.remove('active-scene')
+    });
+
+    nextEl.classList.add('active-scene');
+    gsap.fromTo(nextEl, 
+      { opacity: 0, scale: 0.8, translateZ: -200 }, 
+      { opacity: 1, scale: 1, translateZ: 0, duration: 2, ease: "power2.out", delay: 0.5 }
     );
+
+    // If we reached the final scene (Temple)
+    if (this.currentScene === this.scenes.length - 1) {
+      gsap.to(this.dom.nextBtn, { opacity: 0, duration: 1, onComplete: () => this.dom.nextBtn.remove() });
+      gsap.to('#final-blessing', { opacity: 1, duration: 3, delay: 2 });
+    }
+  }
+
+  showModal(title, text) {
+    this.dom.modalTitle.innerText = title;
+    this.dom.modalText.innerText = text;
+    gsap.to(this.dom.modal, { opacity: 1, duration: 0.5, onStart: () => this.dom.modal.classList.add('active') });
+    gsap.fromTo('.glass-panel', { y: 30, scale: 0.95 }, { y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" });
   }
 
   closeModal() {
-    gsap.to(this.dom.modal, { 
-      opacity: 0, 
-      duration: 0.4, 
-      ease: "power2.in", 
-      onComplete: () => this.dom.modal.classList.remove('active') 
-    });
-  }
-
-  toggleAudio() {
-    if (this.dom.audio.muted) {
-      this.dom.audio.muted = false;
-      this.dom.muteBtn.style.color = 'var(--warm-gold)';
-    } else {
-      this.dom.audio.muted = true;
-      this.dom.muteBtn.style.color = 'var(--mist-gray)';
-    }
+    gsap.to(this.dom.modal, { opacity: 0, duration: 0.4, onComplete: () => this.dom.modal.classList.remove('active') });
   }
 }
 
-// Boot up experience when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  new VesakExperience();
-});
+document.addEventListener('DOMContentLoaded', () => new VesakExperience());
