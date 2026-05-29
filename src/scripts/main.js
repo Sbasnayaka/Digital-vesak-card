@@ -1,6 +1,6 @@
 // src/scripts/main.js
 
-import { Assets, Blessings, JatakaStory } from './assets.js';
+import { Assets, Blessings } from './assets.js';
 import { ParticleSystem } from './particles.js';
 
 class VesakExperience {
@@ -15,7 +15,6 @@ class VesakExperience {
       nextBtn: document.getElementById('next-scene-btn'),
       lanternContainer: document.getElementById('lantern-container'),
       thoranArt: document.getElementById('thoran-art-container'),
-      thoranButtons: document.getElementById('thoran-story-buttons'),
       templeContainer: document.getElementById('temple-container'),
       audio: document.getElementById('ambient-audio'),
       muteBtn: document.getElementById('mute-btn'),
@@ -86,16 +85,22 @@ class VesakExperience {
   }
 
   buildThoranScene() {
-    // Inject the massive glowing SVG
-    this.dom.thoranArt.innerHTML = Assets.getThorana();
+    // We create 3 distinct Thoranas with different color palettes
+    const palettes = [
+      { c1: "#4db8ff", c2: "#99ccff", c3: "#fff" }, // Sapphire/Blue Theme
+      { c1: "#f9d77e", c2: "#ff8a5c", c3: "#a2d5f2" }, // Classic Golden Theme (Center)
+      { c1: "#ff9a9e", c2: "#fecfef", c3: "#fff" }  // Lotus Pink Theme
+    ];
 
-    // Create the story buttons below it
-    JatakaStory.forEach((part, index) => {
-      const btn = document.createElement('button');
-      btn.className = 'story-btn';
-      btn.innerText = `View Part ${index + 1}`;
-      btn.addEventListener('click', () => this.showModal(`Part ${index + 1}: ${part.title}`, part.text));
-      this.dom.thoranButtons.appendChild(btn);
+    palettes.forEach((colors, i) => {
+      const t = document.createElement('div');
+      t.className = 'thorana-item';
+      
+      // We scale the center one up slightly for depth
+      if(i === 1) t.style.transform = "scale(1.15)";
+      
+      t.innerHTML = Assets.getThorana(colors.c1, colors.c2, colors.c3);
+      this.dom.thoranArt.appendChild(t);
     });
   }
 
@@ -125,19 +130,17 @@ class VesakExperience {
       { opacity: 1, scale: 1, translateZ: 0, duration: 2, ease: "power2.out", delay: 0.5 }
     );
 
-    // Final Scene Sequence (English -> Sinhala)
+    // Final Scene Sequence
     if (this.currentScene === this.scenes.length - 1) {
       gsap.to(this.dom.nextBtn, { opacity: 0, duration: 1, onComplete: () => this.dom.nextBtn.remove() });
       
-      // Fade in English Blessing
       gsap.to('#final-blessing', { opacity: 1, duration: 3, delay: 2 });
       
-      // Fade in Sinhala Blessing majestically
       gsap.to('#sinhala-blessing', { 
         opacity: 1, 
         y: -10,
         duration: 3, 
-        delay: 4, // Comes in after the English text
+        delay: 4, 
         ease: "power2.out"
       });
     }
