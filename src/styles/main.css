@@ -1,0 +1,241 @@
+:root {
+  --night-blue: #060b14;
+  --night-gradient: linear-gradient(180deg, #02040a 0%, #060b14 50%, #0d1627 100%);
+  --warm-gold: #f9d77e;
+  --candle-orange: #ff8a5c;
+  --mist-gray: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(10, 15, 29, 0.6);
+  --glass-border: rgba(249, 215, 126, 0.2);
+  
+  --font-serif: 'Cinzel', serif;
+  --font-sans: 'Lato', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--night-blue);
+  background: var(--night-gradient);
+  font-family: var(--font-sans);
+  color: #fff;
+}
+
+/* --- Intro Screen --- */
+#intro-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--night-blue);
+  transition: opacity 2s ease;
+}
+
+.candle-container {
+  width: 80px;
+  height: 120px;
+  opacity: 0;
+  filter: drop-shadow(0 0 20px rgba(255, 138, 92, 0.8));
+}
+
+.intro-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--warm-gold);
+  letter-spacing: 0.2em;
+  margin: 2rem 0;
+  opacity: 0;
+  text-align: center;
+}
+
+.glass-btn {
+  padding: 1rem 2.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  color: var(--warm-gold);
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-btn:hover {
+  background: rgba(249, 215, 126, 0.1);
+  box-shadow: 0 0 20px rgba(249, 215, 126, 0.3);
+  transform: translateY(-2px);
+}
+
+/* --- Immersive World & Parallax --- */
+#immersive-world {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none; /* Enabled via JS later */
+}
+
+#ambient-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+#parallax-container {
+  position: absolute;
+  width: 110vw;
+  height: 110vh;
+  left: -5vw;
+  top: -5vh;
+  z-index: 2;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* Environment Elements */
+.moon {
+  position: absolute;
+  top: 10%;
+  right: 20%;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0%, #f9d77e 40%, transparent 70%);
+  box-shadow: 0 0 100px rgba(249, 215, 126, 0.4);
+  opacity: 0.8;
+}
+
+.layer-temple {
+  bottom: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  opacity: 0.4;
+}
+
+/* Lanterns */
+.lantern-wrapper {
+  position: absolute;
+  cursor: pointer;
+  transition: filter 0.4s ease;
+  will-change: transform;
+}
+.lantern-wrapper:hover {
+  filter: drop-shadow(0 0 30px var(--warm-gold)) brightness(1.2);
+}
+
+/* Thoran */
+.layer-thoran {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.6;
+}
+.thoran-light {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warm-gold);
+  position: absolute;
+  box-shadow: 0 0 10px var(--warm-gold);
+}
+
+/* Lotus Pond Foreground */
+.layer-foreground {
+  top: auto;
+  bottom: 0;
+  height: 25vh;
+  background: linear-gradient(0deg, rgba(6, 11, 20, 1) 0%, rgba(6, 11, 20, 0.7) 60%, transparent 100%);
+  z-index: 10;
+}
+
+/* --- UI & Modals --- */
+.ui-layer {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 20;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--mist-gray);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.icon-btn:hover { color: var(--warm-gold); }
+
+#blessing-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(2, 4, 10, 0.8);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#blessing-modal.active {
+  pointer-events: all;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 3rem;
+  border-radius: 12px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(249, 215, 126, 0.05);
+  position: relative;
+}
+
+#blessing-text {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  line-height: 1.8;
+  color: var(--warm-gold);
+  text-shadow: 0 0 10px rgba(249, 215, 126, 0.3);
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.close-btn:hover { opacity: 1; }
+
+@media (max-width: 768px) {
+  .intro-title { font-size: 1.8rem; }
+  .glass-panel { margin: 1rem; padding: 2rem; }
+  #blessing-text { font-size: 1.1rem; }
+}
