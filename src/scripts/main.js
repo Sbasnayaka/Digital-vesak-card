@@ -14,7 +14,8 @@ class VesakExperience {
       world: document.getElementById('immersive-world'),
       nextBtn: document.getElementById('next-scene-btn'),
       lanternContainer: document.getElementById('lantern-container'),
-      thoranContainer: document.getElementById('thoran-container'),
+      thoranArt: document.getElementById('thoran-art-container'),
+      thoranButtons: document.getElementById('thoran-story-buttons'),
       templeContainer: document.getElementById('temple-container'),
       audio: document.getElementById('ambient-audio'),
       muteBtn: document.getElementById('mute-btn'),
@@ -30,7 +31,6 @@ class VesakExperience {
   init() {
     document.getElementById('initial-candle').innerHTML = Assets.candle;
     
-    // Intro Anim
     gsap.to('#initial-candle', { opacity: 1, duration: 2, delay: 0.5 });
     gsap.to('.intro-title', { opacity: 1, duration: 1.5, y: -10, delay: 1 });
     gsap.to(this.dom.enterBtn, { opacity: 1, duration: 1, y: -5, delay: 1.5 });
@@ -86,30 +86,16 @@ class VesakExperience {
   }
 
   buildThoranScene() {
-    // Build 3 glowing panels for the Jataka Story
-    const positions = [
-      { left: '50px', top: '150px' }, // Left
-      { left: '240px', top: '50px' }, // Center Top
-      { left: '430px', top: '150px' } // Right
-    ];
+    // Inject the massive glowing SVG
+    this.dom.thoranArt.innerHTML = Assets.getThorana();
 
+    // Create the story buttons below it
     JatakaStory.forEach((part, index) => {
-      const panel = document.createElement('div');
-      panel.className = 'thoran-panel';
-      panel.style.left = positions[index].left;
-      panel.style.top = positions[index].top;
-      
-      // Panel Number
-      panel.innerHTML = `<span style="font-family: var(--font-serif); color: var(--warm-gold); font-size: 2rem;">${index + 1}</span>`;
-      
-      panel.addEventListener('click', () => this.showModal(`Part ${index + 1}: ${part.title}`, part.text));
-      this.dom.thoranContainer.appendChild(panel);
-
-      // Gentle pulsing of panels
-      gsap.to(panel, {
-        boxShadow: "inset 0 0 30px rgba(249, 215, 126, 0.4), 0 0 30px rgba(249, 215, 126, 0.6)",
-        duration: 2, yoyo: true, repeat: -1, ease: "sine.inOut", delay: index * 0.5
-      });
+      const btn = document.createElement('button');
+      btn.className = 'story-btn';
+      btn.innerText = `View Part ${index + 1}`;
+      btn.addEventListener('click', () => this.showModal(`Part ${index + 1}: ${part.title}`, part.text));
+      this.dom.thoranButtons.appendChild(btn);
     });
   }
 
@@ -124,10 +110,9 @@ class VesakExperience {
     this.currentScene++;
     const nextEl = document.getElementById(this.scenes[this.currentScene]);
 
-    // Cinematic "Walking Forward" transition
     gsap.to(currentEl, { 
       opacity: 0, 
-      scale: 1.5, // Zoom past the camera
+      scale: 1.5, 
       translateZ: 200, 
       duration: 1.5, 
       ease: "power2.in",
@@ -140,10 +125,21 @@ class VesakExperience {
       { opacity: 1, scale: 1, translateZ: 0, duration: 2, ease: "power2.out", delay: 0.5 }
     );
 
-    // If we reached the final scene (Temple)
+    // Final Scene Sequence (English -> Sinhala)
     if (this.currentScene === this.scenes.length - 1) {
       gsap.to(this.dom.nextBtn, { opacity: 0, duration: 1, onComplete: () => this.dom.nextBtn.remove() });
+      
+      // Fade in English Blessing
       gsap.to('#final-blessing', { opacity: 1, duration: 3, delay: 2 });
+      
+      // Fade in Sinhala Blessing majestically
+      gsap.to('#sinhala-blessing', { 
+        opacity: 1, 
+        y: -10,
+        duration: 3, 
+        delay: 4, // Comes in after the English text
+        ease: "power2.out"
+      });
     }
   }
 

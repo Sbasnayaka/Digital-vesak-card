@@ -7,7 +7,8 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+  <!-- Added Abhaya Libre for beautiful Sinhala typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@500;700&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
   <link rel="stylesheet" href="/src/styles/main.css">
@@ -30,25 +31,33 @@
 
     <div id="journey-container">
       
+      <!-- SCENE 1: Lanterns -->
       <div class="scene active-scene" id="scene-lanterns">
         <h2 class="scene-title">The Path of Light</h2>
         <p class="scene-subtitle">Click the lanterns to reveal blessings</p>
         <div id="lantern-container"></div>
       </div>
 
+      <!-- SCENE 2: The Magnificent Thorana -->
       <div class="scene" id="scene-thoran">
-        <h2 class="scene-title">The Jataka Thoran</h2>
-        <p class="scene-subtitle">Click the glowing panels to read the story of compassion</p>
-        <div id="thoran-container"></div>
+        <div id="thoran-art-container">
+          <!-- Animated Thorana SVG goes here -->
+        </div>
+        <div id="thoran-story-buttons">
+          <!-- Story trigger buttons go here -->
+        </div>
       </div>
 
+      <!-- SCENE 3: The Temple -->
       <div class="scene" id="scene-temple">
         <h2 class="scene-title" id="final-blessing">May you find ultimate peace.</h2>
+        <h3 id="sinhala-blessing">තෙරුවන් සරණයි...!!!</h3>
         <div id="temple-container"></div>
       </div>
 
     </div>
 
+    <!-- UI Overlay -->
     <div class="ui-layer">
       <button id="mute-btn" class="icon-btn">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
@@ -57,6 +66,7 @@
 
     <button id="next-scene-btn" class="glass-btn walk-btn hidden">Walk Forward ➔</button>
 
+    <!-- Reading Modal -->
     <div id="blessing-modal" class="hidden">
       <div class="modal-content glass-panel">
         <button id="close-modal" class="close-btn">&times;</button>

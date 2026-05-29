@@ -33,6 +33,58 @@ export const Assets = {
       <line x1="80" y1="110" x2="85" y2="150" stroke="rgba(249, 215, 126, 0.6)" stroke-width="1.5"/>
     </svg>`,
 
+  // The Grand Digital Thorana Structure with Chasing Lights
+  getThorana: () => `
+    <svg viewBox="0 0 800 600" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <style>
+        .t-spin-fast { transform-origin: 400px 300px; animation: t-spin 5s linear infinite; }
+        .t-spin-slow-rev { transform-origin: 400px 300px; animation: t-spin 8s linear infinite reverse; }
+        .t-spin-med { transform-origin: 400px 300px; animation: t-spin 3s linear infinite; }
+        .t-pulse { animation: t-pulse 1s alternate infinite; transform-origin: center; }
+        .t-flash { animation: t-flash 0.5s steps(2) infinite; }
+        
+        @keyframes t-spin { 100% { transform: rotate(360deg); } }
+        @keyframes t-pulse { 0% { opacity: 0.6; filter: drop-shadow(0 0 10px #f9d77e); transform: scale(0.98); } 100% { opacity: 1; filter: drop-shadow(0 0 30px #fff); transform: scale(1.02); } }
+        @keyframes t-flash { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+      </style>
+      
+      <defs>
+        <radialGradient id="tGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0.8"/>
+          <stop offset="50%" stop-color="#f9d77e" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#ff8a5c" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Center Ambient Glow -->
+      <circle cx="400" cy="300" r="150" fill="url(#tGlow)" class="t-pulse" />
+
+      <!-- Concentric Chasing LED Rings (The hallmark of a Thorana) -->
+      <circle cx="400" cy="300" r="280" stroke="#f9d77e" stroke-width="12" stroke-dasharray="20 20" fill="none" class="t-spin-fast" filter="drop-shadow(0 0 10px #f9d77e)"/>
+      <circle cx="400" cy="300" r="260" stroke="#ff8a5c" stroke-width="8" stroke-dasharray="10 30" fill="none" class="t-spin-slow-rev" filter="drop-shadow(0 0 10px #ff8a5c)"/>
+      <circle cx="400" cy="300" r="230" stroke="#fff" stroke-width="15" stroke-dasharray="5 15" fill="none" class="t-spin-med" filter="drop-shadow(0 0 15px #fff)"/>
+      <circle cx="400" cy="300" r="200" stroke="#f9d77e" stroke-width="6" stroke-dasharray="40 10" fill="none" class="t-spin-slow-rev" filter="drop-shadow(0 0 8px #f9d77e)"/>
+      <circle cx="400" cy="300" r="160" stroke="#a2d5f2" stroke-width="10" stroke-dasharray="15 15" fill="none" class="t-spin-fast" filter="drop-shadow(0 0 10px #a2d5f2)"/>
+
+      <!-- Thorana Wings (Side Structures) -->
+      <!-- Left Wing Cascades -->
+      <path d="M 120 300 Q 50 400 100 550" fill="none" stroke="#f9d77e" stroke-width="8" stroke-dasharray="10 20" class="t-spin-slow-rev" />
+      <path d="M 140 300 Q 80 400 130 550" fill="none" stroke="#ff8a5c" stroke-width="5" stroke-dasharray="5 10" class="t-spin-fast" />
+      
+      <!-- Right Wing Cascades -->
+      <path d="M 680 300 Q 750 400 700 550" fill="none" stroke="#f9d77e" stroke-width="8" stroke-dasharray="10 20" class="t-spin-slow-rev" />
+      <path d="M 660 300 Q 720 400 670 550" fill="none" stroke="#ff8a5c" stroke-width="5" stroke-dasharray="5 10" class="t-spin-fast" />
+
+      <!-- Center Lotus Silhouette -->
+      <path d="M 400 350 Q 370 270 400 200 Q 430 270 400 350 Z" fill="#fff" class="t-pulse"/>
+      <path d="M 400 350 Q 320 300 330 230 Q 370 280 400 350 Z" fill="#f9d77e" class="t-pulse"/>
+      <path d="M 400 350 Q 480 300 470 230 Q 430 280 400 350 Z" fill="#f9d77e" class="t-pulse"/>
+      
+      <!-- Base Structure Lines -->
+      <rect x="350" y="550" width="100" height="50" fill="#03060a" stroke="#f9d77e" stroke-width="2"/>
+    </svg>
+  `,
+
   stupa: `
     <svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -53,9 +105,8 @@ export const Blessings = [
   "Peace comes from within. Do not seek it without."
 ];
 
-// The Sasa Jataka (Story of the Rabbit) for the Thoran
 export const JatakaStory = [
-  { title: "The Generous Friends", text: "Long ago, a monkey, a jackal, an otter, and a rabbit promised to practice charity on the full moon day. They each gathered food to offer to any beggar they met." },
-  { title: "The Ultimate Sacrifice", text: "When a beggar (the deity Sakka in disguise) approached the rabbit, the rabbit had nothing but grass. True to his vow, he offered his own body by jumping into the beggar's fire." },
-  { title: "The Mark on the Moon", text: "Moved by his ultimate compassion, Sakka cooled the fire instantly. He drew the image of the selfless rabbit on the moon, so his sacrifice would be remembered forever." }
+  { title: "The Promise", text: "Long ago, a monkey, a jackal, an otter, and a rabbit promised to practice charity on the full moon day. They each gathered food to offer to any beggar they met." },
+  { title: "The Sacrifice", text: "When a beggar approached the rabbit, he had nothing but grass. True to his vow of absolute charity, he offered his own body by jumping into the beggar's fire." },
+  { title: "The Mark on the Moon", text: "Moved by his ultimate compassion, the deity cooled the fire instantly and drew the rabbit's image on the moon, ensuring his sacrifice would illuminate the night sky forever." }
 ];
